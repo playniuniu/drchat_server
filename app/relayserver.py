@@ -3,7 +3,6 @@
 
 import socket
 import multiprocessing
-import os
 import config
 from config import logger
 from app.msgsend import send_to_redis
@@ -31,7 +30,7 @@ def run_relay_server():
     listen_socket.bind((config.SERVER_HOST,config.RELAY_PORT))
     listen_socket.listen(5)
 
-    logger.info("Listen on localhost:3002")
+    logger.info("Listen on {}:{}".format(config.SERVER_HOST,config.RELAY_PORT))
 
     while True:
         sock, addr = listen_socket.accept()
