@@ -18,6 +18,7 @@ def process_message(sock, addr):
             break
 
     # Close socket
+    sock.shutdown(socket.SHUT_WR)
     sock.close()
 
     # reconstruct message
