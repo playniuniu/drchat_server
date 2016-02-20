@@ -47,7 +47,7 @@ def init_sio():
     def process_message(sid, data):
         logger.debug('message {}'.format(data))
         # Send to local web server
-        sio.emit('msg', data, namespace=socketio_namespace, skip_sid=sid)
+        # sio.emit('msg', data, namespace=socketio_namespace, skip_sid=sid)
         # Send to socket
         send_to_socket('msg', data, namespace=socketio_namespace)
 
