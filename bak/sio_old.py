@@ -39,5 +39,5 @@ def socketio_chat(message):
     emit('msg', message,  broadcast=True)
 
 def run_socketio_server():
-    logger.info("Socketio server run on host:{}, port:{}".format(config.SERVER_HOST, config.FLASK_PORT))
-    socketio_app.run(app, host=config.SERVER_HOST, port=config.FLASK_PORT)
+    logger.info("Socketio server run on host:{}, port:{}".format(config.SERVER_HOST, config.MSG_SERVER_PORT))
+    socketio_app.run(app, host=config.SERVER_HOST, port=config.MSG_SERVER_PORT)

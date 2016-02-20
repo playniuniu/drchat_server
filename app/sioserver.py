@@ -54,8 +54,8 @@ def init_sio():
     return sio
 
 def run_socketio_server():
-    logger.info("Socketio server run on host:{}, port:{}".format(config.SERVER_HOST, config.FLASK_PORT))
+    logger.info("Socketio server run on host:{}, port:{}".format(config.SERVER_HOST, config.MSG_SERVER_PORT))
     sio = init_sio()
     app = socketio.Middleware(sio)
-    eventlet_socket = eventlet.listen(('', config.FLASK_PORT))
+    eventlet_socket = eventlet.listen(('', config.MSG_SERVER_PORT))
     wsgi.server(eventlet_socket, app)

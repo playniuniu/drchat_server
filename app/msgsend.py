@@ -8,15 +8,15 @@ from config import logger
 
 def send_to_socket(msg_type, msg, **kwargs):
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    send_addr = (config.REMOTE_RELAY_IP, config.REMOTE_RELAY_PORT)
+    send_addr = (config.MSG_SEND_IP, config.MSG_SEND_PORT)
     namespace = kwargs.get('namespace', config.SOCKET_IO_NAMESPACE)
 
     try:
         send_socket.connect(send_addr)
         send_socket.send(msg.encode(encoding='UTF-8'))
-        logger.debug("Send msg: {} to {}:{}".format(msg, config.REMOTE_RELAY_IP, config.REMOTE_RELAY_PORT))
+        logger.debug("Send msg: {} to {}:{}".format(msg, config.MSG_SEND_IP, config.MSG_SERVER_PORT))
     except:
-        logger.error("Send msg to {}:{} error!".format(config.REMOTE_RELAY_IP, config.REMOTE_RELAY_PORT))
+        logger.error("Send msg to {}:{} error!".format(config.MSG_SEND_IP, config.MSG_SEND_PORT))
 
     send_socket.close()
 

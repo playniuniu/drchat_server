@@ -27,10 +27,10 @@ def process_message(sock, addr):
 
 def run_relay_server():
     listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    listen_socket.bind((config.SERVER_HOST,config.RELAY_PORT))
+    listen_socket.bind((config.SERVER_HOST,config.TCP_SERVER_PORT))
     listen_socket.listen(5)
 
-    logger.info("Listen on {}:{}".format(config.SERVER_HOST,config.RELAY_PORT))
+    logger.info("Listen on {}:{}".format(config.SERVER_HOST,config.TCP_SERVER_PORT))
 
     while True:
         sock, addr = listen_socket.accept()
