@@ -1,4 +1,4 @@
-eventlet==0.18.3
+eventlet==0.18.4
 greenlet==0.4.9
 python-engineio==0.8.7
 python-socketio==1.0
