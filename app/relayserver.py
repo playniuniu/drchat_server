@@ -3,12 +3,18 @@
 
 import socket
 import multiprocessing
-import config
-from config import logger
+import logging
+from config import config
 from app.msgsend import send_to_redis
 
+try:
+    from config_override import config_override
+    config.update(config_override)
+except ImportError:
+    pass
+
 def process_message(sock, addr):
-    logger.debug("Process message from {}".format(addr))
+    logging.debug("Process message from {}".format(addr))
     recv_buffer_list = []
     while True:
         recv_buf = sock.recv(1024)
@@ -28,10 +34,10 @@ def process_message(sock, addr):
 
 def run_relay_server():
     listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    listen_socket.bind((config.SERVER_HOST,config.TCP_SERVER_PORT))
+    listen_socket.bind((config['SERVER_HOST'],config['TCP_SERVER_PORT']))
     listen_socket.listen(5)
 
-    logger.info("Listen on {}:{}".format(config.SERVER_HOST,config.TCP_SERVER_PORT))
+    logging.info("Listen on {}:{}".format(config['SERVER_HOST'],config['TCP_SERVER_PORT']))
 
     while True:
         sock, addr = listen_socket.accept()

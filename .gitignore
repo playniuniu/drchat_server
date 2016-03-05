@@ -1,3 +1,4 @@
+config_override.py
 *.pyc
 .DS_Store
 .idea/
