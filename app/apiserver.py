@@ -47,6 +47,13 @@ class MessageHandler(RequestHandler):
 
         self.write(response)
 
+        # 允许跨域访问
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, UPDATE, DELETE, OPTIONS')
+        self.set_header('Access-Control-Max-Age', 1728000)
+        self.set_header('Access-Control-Allow-Headers', '*')
+
+
 def process_redis_message(message_data):
     message_arr = []
     for el in message_data:
