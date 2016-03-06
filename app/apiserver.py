@@ -120,4 +120,6 @@ def process_redis_message(message_data, toUser):
         # 判断收发联系人都一致
         if 'toUser' in parse_msg and parse_msg['toUser'] == toUser:
             message_arr.append(msg)
+        elif 'fromUser' in parse_msg and parse_msg['fromUser'] == toUser:
+            message_arr.append(msg)
     return message_arr
