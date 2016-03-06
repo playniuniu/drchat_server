@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from tornado.web import RequestHandler, Application
-import tornado.wsgi
+import json
+from bottle import Bottle, response
 import redis
 from config import config
 import logging
@@ -12,57 +12,112 @@ try:
 except ImportError:
     pass
 
-class MainHandler(RequestHandler):
-    def get(self):
+app = Bottle()
+
+@app.hook('after_request')
+def enable_cors():
+    """
+    You need to add some headers to each request.
+    Don't use the wildcard '*' for Access-Control-Allow-Origin in production.
+    """
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Methods'] = 'PUT, GET, POST, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+
+
+@app.route('/')
+def index():
+    response = {
+        'description': 'redis message history api server',
+        'version': 'v0.1'
+    }
+    return response
+
+@app.route('/messagelist/<username>')
+def messagelist(username):
+    messageList = []
+
+    if username == 'drchat':
+        messageList.append({'userName': 'aws', 'msgCount': '无消息'})
+
+    elif username == 'aws':
+        messageList.append({'userName': 'drchat', 'msgCount': '无消息'})
+
+    else:
+        pass
+
+    if messageList:
         response = {
-            'description': 'redis message history api server',
-            'version': 'v0.1'
+            'status': 'ok',
+            'data' : messageList,
         }
-        self.write(response)
+    else:
+        response = {
+            'status': 'err',
+            'data' : '没有历史消息',
+        }
 
-class MessageHandler(RequestHandler):
-    def get(self, username):
-        message_key = "{}:msg".format(username)
-        try:
-            redis_client = redis.StrictRedis.from_url(config['REDIS_URL'])
-            message_data = redis_client.lrange(message_key, 0, config['REDIS_HISTORY_LONG'])
-        except:
-            logging.error("ERROR! Cannot connect to {}".format(config['REDIS_URL']))
-            message_data = None
+    return response
+
+@app.route('/contactlist/<username>')
+def contactlist(username):
+    contactlist = []
+
+    if username == 'drchat':
+        contactlist.append({'userName': 'aws'})
+
+    elif username == 'aws':
+        contactlist.append({'userName': 'drchat'})
+
+    else:
+        pass
+
+    if contactlist:
+        response = {
+            'status': 'ok',
+            'data' : contactlist,
+        }
+    else:
+        response = {
+            'status': 'err',
+            'data' : '没有联系人信息',
+        }
+
+    return response
+
+@app.route('/messages/<fromUser>/<toUser>')
+def messages(fromUser, toUser):
+    message_key = "{}:msg".format(fromUser)
+    try:
+        redis_client = redis.StrictRedis.from_url(config['REDIS_URL'])
+        message_data = redis_client.lrange(message_key, 0, config['REDIS_HISTORY_LONG'])
+    except:
+        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_URL']))
+        message_data = None
 
 
-        if message_data:
-            message_parse = process_redis_message(message_data)
-            response = {
-                'status' : 'ok',
-                'data' : message_parse,
-            }
-            logging.debug("message: {}".format(message_parse))
-        else:
-            response = {
-                'status' : 'error',
-                'data' : 'cannot get {} message'.format(username)
-            }
-            logging.error('ERROR! Cannot get {} message'.format(username))
+    if message_data:
+        message_parse = process_redis_message(message_data, toUser)
+        response = {
+            'status' : 'ok',
+            'data' : message_parse,
+        }
+        logging.debug("message: {}".format(message_parse))
+    else:
+        response = {
+            'status' : 'error',
+            'data' : 'cannot get {}/{} message'.format(fromUser,toUser)
+        }
+        logging.error('ERROR! Cannot get {}/{} message'.format(fromUser,toUser))
 
-        self.write(response)
+    return response
 
-        # 允许跨域访问
-        self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'POST, GET, UPDATE, DELETE, OPTIONS')
-        self.set_header('Access-Control-Max-Age', 1728000)
-        self.set_header('Access-Control-Allow-Headers', '*')
-
-
-def process_redis_message(message_data):
+def process_redis_message(message_data, toUser):
     message_arr = []
     for el in message_data:
-        message_arr.append(el.decode('utf-8'))
+        msg = el.decode('utf-8')
+        parse_msg = json.loads(msg)
+        # 判断收发联系人都一致
+        if 'toUser' in parse_msg and parse_msg['toUser'] == toUser:
+            message_arr.append(msg)
     return message_arr
-
-application = Application([
-    (r"/", MainHandler),
-    (r"/message/(\w+)", MessageHandler),
-])
-
-apiserver = tornado.wsgi.WSGIAdapter(application)
