@@ -6,6 +6,7 @@ import eventlet
 from eventlet import wsgi
 from config import config
 from app.msgprocess import send_to_socket, save_message
+from app.apiserver import apiserver
 
 try:
     from config_override import config_override
@@ -64,6 +65,6 @@ def init_sio():
 def run_socketio_server():
     logging.info("Socketio server run on host:{}, port:{}".format(config['SERVER_HOST'], config['MSG_SERVER_PORT']))
     sio = init_sio()
-    app = socketio.Middleware(sio)
+    app = socketio.Middleware(sio, apiserver)
     eventlet_socket = eventlet.listen(('', config['MSG_SERVER_PORT']))
     wsgi.server(eventlet_socket, app)

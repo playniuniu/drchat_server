@@ -4,4 +4,4 @@ python-engineio==0.8.8
 python-socketio==1.0
 redis==2.10.5
 six==1.10.0
-wheel==0.29.0
+tornado==4.3
