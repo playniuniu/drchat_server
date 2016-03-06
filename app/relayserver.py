@@ -5,7 +5,7 @@ import socket
 import multiprocessing
 import logging
 from config import config
-from app.msgsend import send_to_redis
+from app.msgprocess import send_to_redis, save_message
 
 try:
     from config_override import config_override
@@ -31,6 +31,9 @@ def process_message(sock, addr):
     recv_message = b''.join(recv_buffer_list)
     recv_message = recv_message.decode('utf-8')
     send_to_redis(recv_message)
+
+    # save history message to redis
+    save_message(recv_message, 'to')
 
 def run_relay_server():
     listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

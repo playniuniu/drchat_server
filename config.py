@@ -13,6 +13,7 @@ config = {
     # 设置 Redis
     'REDIS_URL' : 'redis://127.0.0.1:6379/0',
     'REDIS_CHANNEL' : 'drchat',
+    'REDIS_HISTORY_LONG' : 1000,
     # 设置 SocketIO namespace
     'SOCKET_IO_NAMESPACE' : '/drchat',
     # 设置 SECRET KEY

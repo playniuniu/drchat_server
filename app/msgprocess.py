@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
 import socket
 import socketio
 import logging
@@ -37,3 +38,15 @@ def send_to_redis(msg):
     sio = init_redis()
     sio.emit('msg', msg, namespace=config['SOCKET_IO_NAMESPACE'])
     logging.debug("Emit msg: {} success".format(msg))
+
+
+def save_message(msg, message_type):
+    try:
+        redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['REDIS_CHANNEL'], write_only=True)
+        redis_client = redis_mgr.redis
+        json_msg = json.loads(msg)
+        save_key = "{}:history".format(json_msg[message_type])
+        redis_client.lpush(save_key, msg)
+        redis_client.ltrim(save_key, 0, config['REDIS_HISTORY_LONG'])
+    except:
+        logging.error("Cannot save history message to redis")

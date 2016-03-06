@@ -5,7 +5,7 @@ import logging
 import eventlet
 from eventlet import wsgi
 from config import config
-from app.msgsend import send_to_socket
+from app.msgprocess import send_to_socket, save_message
 
 try:
     from config_override import config_override
@@ -56,6 +56,8 @@ def init_sio():
         # sio.emit('msg', data, namespace=socketio_namespace, skip_sid=sid)
         # Send to socket
         send_to_socket('msg', data, namespace=socketio_namespace)
+        # save history message to redis
+        save_message(data, 'from')
 
     return sio
 
