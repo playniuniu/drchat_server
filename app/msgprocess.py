@@ -21,7 +21,7 @@ def send_to_socket(msg_type, msg, **kwargs):
     try:
         send_socket.connect(send_addr)
         send_socket.send(msg.encode(encoding='UTF-8'))
-        logging.debug("Send msg: {} to {}:{}".format(msg, config['MSG_SEND_IP'], config['MSG_SERVER_PORT']))
+        logging.debug("Send msg to {}:{}".format(config['MSG_SEND_IP'], config['MSG_SERVER_PORT']))
     except:
         logging.error("Send msg to {}:{} error!".format(config['MSG_SEND_IP'], config['MSG_SEND_PORT']))
 
@@ -45,7 +45,13 @@ def save_message(msg, message_type):
         redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['REDIS_CHANNEL'], write_only=True)
         redis_client = redis_mgr.redis
         json_msg = json.loads(msg)
-        save_key = "{}:history".format(json_msg[message_type])
+
+        # toUser 和 fromUser 需要参考前端的 API
+        if message_type == 'receive' :
+            save_key = "{}:msg".format(json_msg['toUser'])
+        else:
+            save_key = "{}:msg".format(json_msg['fromUser'])
+
         redis_client.lpush(save_key, msg)
         redis_client.ltrim(save_key, 0, config['REDIS_HISTORY_LONG'])
     except:

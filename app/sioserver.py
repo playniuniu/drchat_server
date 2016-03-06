@@ -58,7 +58,7 @@ def init_sio():
         # Send to socket
         send_to_socket('msg', data, namespace=socketio_namespace)
         # save history message to redis
-        save_message(data, 'from')
+        save_message(data, 'send')
 
     return sio
 

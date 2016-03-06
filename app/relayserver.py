@@ -33,7 +33,7 @@ def process_message(sock, addr):
     send_to_redis(recv_message)
 
     # save history message to redis
-    save_message(recv_message, 'to')
+    save_message(recv_message, 'receive')
 
 def run_relay_server():
     listen_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

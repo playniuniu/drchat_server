@@ -22,7 +22,7 @@ class MainHandler(RequestHandler):
 
 class MessageHandler(RequestHandler):
     def get(self, username):
-        message_key = "{}:history".format(username)
+        message_key = "{}:msg".format(username)
         try:
             redis_client = redis.StrictRedis.from_url(config['REDIS_URL'])
             message_data = redis_client.lrange(message_key, 0, config['REDIS_HISTORY_LONG'])
