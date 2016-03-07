@@ -87,7 +87,7 @@ def contactlist(username):
 
 @app.route('/messages/<fromUser>/<toUser>')
 def messages(fromUser, toUser):
-    message_key = "{}:msg".format(fromUser)
+    message_key = "msg:{}:{}".format(fromUser, toUser)
     try:
         redis_client = redis.StrictRedis.from_url(config['REDIS_URL'])
         message_data = redis_client.lrange(message_key, 0, config['REDIS_HISTORY_LONG'])
@@ -97,29 +97,25 @@ def messages(fromUser, toUser):
 
 
     if message_data:
-        message_parse = process_redis_message(message_data, toUser)
+        parse_data = parse_redis_msg(message_data)
         response = {
             'status' : 'ok',
-            'data' : message_parse,
+            'data' : parse_data,
         }
-        logging.debug("message: {}".format(message_parse))
+        logging.debug("message: {}".format(parse_data))
     else:
         response = {
             'status' : 'error',
-            'data' : 'cannot get {}/{} message'.format(fromUser,toUser)
+            'data' : 'cannot get msg:{}:{} message'.format(fromUser,toUser)
         }
-        logging.error('ERROR! Cannot get {}/{} message'.format(fromUser,toUser))
+        logging.error('ERROR! Cannot get msg:{}:{} message'.format(fromUser,toUser))
 
     return response
 
-def process_redis_message(message_data, toUser):
+def parse_redis_msg(message_data):
     message_arr = []
     for el in message_data:
-        msg = el.decode('utf-8')
-        parse_msg = json.loads(msg)
-        # 判断收发联系人都一致
-        if 'toUser' in parse_msg and parse_msg['toUser'] == toUser:
-            message_arr.append(msg)
-        elif 'fromUser' in parse_msg and parse_msg['fromUser'] == toUser:
-            message_arr.append(msg)
+        parse_el = el.decode('utf-8')
+        message_arr.append(parse_el)
+
     return message_arr
