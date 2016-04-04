@@ -5,7 +5,7 @@ import logging
 import eventlet
 from eventlet import wsgi
 from config import config
-from app.msgprocess import send_to_socket, save_message
+from lib.message import save_message
 from app.apiserver import app
 
 try:
@@ -19,7 +19,7 @@ def init_redis():
     eventlet.monkey_patch()
 
     # Set redis manager
-    redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['REDIS_CHANNEL'])
+    redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['SOCKET_IO_CHANNEL'])
 
     # Setting socket-io
     sio = socketio.Server(client_manager=redis_mgr)
@@ -55,16 +55,15 @@ def init_sio():
         logging.debug('message {}'.format(data))
         # Send to local web server
         # sio.emit('msg', data, namespace=socketio_namespace, skip_sid=sid)
-        # Send to socket
-        send_to_socket('msg', data, namespace=socketio_namespace)
+
         # save history message to redis
         save_message(data, 'send')
 
     return sio
 
 def run_socketio_server():
-    logging.info("Socketio server run on host:{}, port:{}".format(config['SERVER_HOST'], config['MSG_SERVER_PORT']))
+    logging.info("Socketio server run on host:{}, port:{}".format(config['SERVER_HOST'], config['SERVER_PORT']))
     sio = init_sio()
     hybrid_server = socketio.Middleware(sio, app)
-    eventlet_socket = eventlet.listen(('', config['MSG_SERVER_PORT']))
+    eventlet_socket = eventlet.listen(('', config['SERVER_PORT']))
     wsgi.server(eventlet_socket, hybrid_server)

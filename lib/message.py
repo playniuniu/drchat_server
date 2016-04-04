@@ -67,7 +67,7 @@ def send_to_socket(msg_type, msg, **kwargs):
 def send_to_redis(msg):
 
     def init_redis():
-        redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['REDIS_CHANNEL'], write_only=True)
+        redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['SOCKET_IO_CHANNEL'], write_only=True)
         sio = socketio.Server(client_manager=redis_mgr)
         return sio
 
@@ -85,7 +85,7 @@ def send_to_redis(msg):
 
 def save_message(msg, message_type):
     try:
-        redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['REDIS_CHANNEL'], write_only=True)
+        redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['SOCKET_IO_CHANNEL'], write_only=True)
         redis_client = redis_mgr.redis
 
         # toUser 和 fromUser 需要参考前端的 API
