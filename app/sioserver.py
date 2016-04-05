@@ -5,7 +5,6 @@ import logging
 import eventlet
 from eventlet import wsgi
 from config import config
-from lib.message import save_message
 from app.apiserver import app
 
 try:
@@ -14,7 +13,7 @@ try:
 except ImportError:
     pass
 
-def init_redis():
+def init_redis_io():
     # Setting eventlet, important
     eventlet.monkey_patch()
 
@@ -22,12 +21,12 @@ def init_redis():
     redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['SOCKET_IO_CHANNEL'])
 
     # Setting socket-io
-    sio = socketio.Server(client_manager=redis_mgr)
+    socket_io = socketio.Server(client_manager=redis_mgr)
 
-    return sio
+    return socket_io
 
 def init_sio():
-    sio = init_redis()
+    sio = init_redis_io()
 
     # Setting namespace
     socketio_namespace = config['SOCKET_IO_NAMESPACE']
@@ -53,11 +52,12 @@ def init_sio():
     @sio.on('msg', namespace=socketio_namespace)
     def process_message(sid, data):
         logging.debug('message {}'.format(data))
+
         # Send to local web server
-        # sio.emit('msg', data, namespace=socketio_namespace, skip_sid=sid)
+        sio.emit('msg', data, namespace=socketio_namespace, skip_sid=sid)
 
         # save history message to redis
-        save_message(data, 'send')
+        # lib_save_message(data, 'send')
 
     return sio
 
