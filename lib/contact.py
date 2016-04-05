@@ -20,10 +20,10 @@ def lib_add_contact(username, contact_username, contact_nickname):
     }
 
     try:
-        redis_client = redis.StrictRedis.from_url(config['REDIS_URL'])
+        redis_client = redis.StrictRedis.from_url(config['REDIS_REMOTE_URL'])
         redis_client.hset(hash_key, contact_username, json.dumps(params))
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_URL']))
+        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response
@@ -38,10 +38,10 @@ def lib_get_contact(username):
     response = {}
 
     try:
-        redis_client = redis.StrictRedis.from_url(config['REDIS_URL'])
+        redis_client = redis.StrictRedis.from_url(config['REDIS_LOCAL_URL'])
         redis_data = redis_client.hvals(hash_key)
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_URL']))
+        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response

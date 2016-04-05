@@ -18,10 +18,10 @@ def lib_user_register(username, password):
     response = {}
 
     try:
-        redis_client = redis.StrictRedis.from_url(config['REDIS_URL'])
+        redis_client = redis.StrictRedis.from_url(config['REDIS_REMOTE_URL'])
         redis_data = redis_client.hget(hash_key, username)
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_URL']))
+        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response
@@ -49,10 +49,10 @@ def lib_user_login(username, password):
     response = {}
 
     try:
-        redis_client = redis.StrictRedis.from_url(config['REDIS_URL'])
+        redis_client = redis.StrictRedis.from_url(config['REDIS_LOCAL_URL'])
         redis_data = redis_client.hget(hash_key, username)
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_URL']))
+        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response

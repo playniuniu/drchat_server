@@ -19,7 +19,7 @@ def init_redis_io():
     eventlet.monkey_patch()
 
     # Set redis manager
-    redis_mgr = socketio.RedisManager(url=config['REDIS_URL'], channel=config['SOCKET_IO_CHANNEL'])
+    redis_mgr = socketio.RedisManager(url=config['REDIS_LOCAL_URL'], channel=config['SOCKET_IO_CHANNEL'])
 
     # Setting socket-io
     socket_io = socketio.Server(client_manager=redis_mgr)

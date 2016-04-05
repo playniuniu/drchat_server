@@ -2,17 +2,9 @@
 # -*- coding: utf-8 -*-
 import json
 from bottle import Bottle, response, request
-import redis
 from lib.user import lib_user_login, lib_user_register
 from lib.contact import lib_add_contact, lib_get_contact
-from config import config
-import logging
-
-try:
-    from config_override import config_override
-    config.update(config_override)
-except ImportError:
-    pass
+from lib.message import lib_get_message_history
 
 app = Bottle()
 
@@ -66,89 +58,12 @@ def post_contact(username):
     response = lib_add_contact(username, contact_username, contact_nickname)
     return json.dumps(response)
 
-@app.route('/messagelist/<username>')
-def messagelist(username):
-    messageList = []
+# 获取联系人消息列表
+@app.route('/msglist/<username>', method='GET')
+def get_message_list(username):
+    pass
 
-    if username == 'drchat':
-        messageList.append({'userName': 'aws', 'msgCount': '无消息'})
-
-    elif username == 'aws':
-        messageList.append({'userName': 'drchat', 'msgCount': '无消息'})
-
-    else:
-        pass
-
-    if messageList:
-        response = {
-            'status': 'ok',
-            'data' : messageList,
-        }
-    else:
-        response = {
-            'status': 'err',
-            'data' : '没有历史消息',
-        }
-
-    return response
-
-@app.route('/contactlist/<username>')
-def contactlist(username):
-    contactlist = []
-
-    if username == 'drchat':
-        contactlist.append({'userName': 'aws'})
-
-    elif username == 'aws':
-        contactlist.append({'userName': 'drchat'})
-
-    else:
-        pass
-
-    if contactlist:
-        response = {
-            'status': 'ok',
-            'data' : contactlist,
-        }
-    else:
-        response = {
-            'status': 'err',
-            'data' : '没有联系人信息',
-        }
-
-    return response
-
-@app.route('/messages/<fromUser>/<toUser>')
-def messages(fromUser, toUser):
-    message_key = "msg:{}:{}".format(fromUser, toUser)
-    try:
-        redis_client = redis.StrictRedis.from_url(config['REDIS_URL'])
-        message_data = redis_client.lrange(message_key, 0, config['REDIS_HISTORY_LONG'])
-    except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_URL']))
-        message_data = None
-
-
-    if message_data:
-        parse_data = parse_redis_msg(message_data)
-        response = {
-            'status' : 'ok',
-            'data' : parse_data,
-        }
-        logging.debug("message: {}".format(parse_data))
-    else:
-        response = {
-            'status' : 'error',
-            'data' : 'cannot get msg:{}:{} message'.format(fromUser,toUser)
-        }
-        logging.error('ERROR! Cannot get msg:{}:{} message'.format(fromUser,toUser))
-
-    return response
-
-def parse_redis_msg(message_data):
-    message_arr = []
-    for el in message_data:
-        parse_el = el.decode('utf-8')
-        message_arr.append(parse_el)
-
-    return message_arr
+# 获取历史消息
+@app.route('/msghistory/<fromUser>/<toUser>', method='GET')
+def get_message_history(fromUser, toUser):
+    return lib_get_message_history(fromUser, toUser)
