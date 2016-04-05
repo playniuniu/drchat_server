@@ -6,6 +6,7 @@ import eventlet
 from eventlet import wsgi
 from config import config
 from app.apiserver import app
+from lib.message import lib_send_redis_message
 
 try:
     from config_override import config_override
@@ -51,13 +52,13 @@ def init_sio():
     # Process socket io msg
     @sio.on('msg', namespace=socketio_namespace)
     def process_message(sid, data):
-        logging.debug('message {}'.format(data))
+        logging.debug('process message: {}'.format(data))
 
-        # Send to local web server
-        sio.emit('msg', data, namespace=socketio_namespace, skip_sid=sid)
+        # Send to redis message queen
+        lib_send_redis_message(data)
 
-        # save history message to redis
-        # lib_save_message(data, 'send')
+        # Emit message to socket.io
+        # sio.emit('msg', data, namespace=socketio_namespace, skip_sid=sid)
 
     return sio
 

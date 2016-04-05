@@ -9,7 +9,7 @@ config = {
     'SOCKET_IO_CHANNEL': 'drchat',
     'SOCKET_IO_NAMESPACE' : '/drchat',
     # 设置 Redis
-    'REDIS_URL': 'redis://127.0.0.1:6379/0',
+    'REDIS_URL': 'redis://drchat.uunus.cn:6379/0',
     'REDIS_HISTORY_LONG': 1000,
     # 设置 Debug
     'DEBUG_MODE' : 'True',
