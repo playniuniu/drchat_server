@@ -3,7 +3,7 @@
 import json
 from bottle import Bottle, response, request
 from lib.user import lib_user_login, lib_user_register
-from lib.contact import lib_add_contact, lib_get_contact
+from lib.contact import lib_add_contact, lib_get_contact, lib_delete_contact
 from lib.message import lib_get_message_history
 
 app = Bottle()
@@ -51,11 +51,26 @@ def get_contact(username):
     return json.dumps(response)
 
 # 添加联系人信息
-@app.route('/contact/<username>', method='POST')
-def post_contact(username):
-    contact_username = request.forms.get('username')
-    contact_nickname = request.forms.get('nickname')
+@app.route('/contact/<username>',  method=['OPTIONS', 'PUT'])
+def update_contact(username):
+    # 处理跨域访问中, 先发送 OPTIONS 的问题
+    if request.method == 'OPTIONS':
+        return {}
+
+    contact_username = request.params.get('username')
+    contact_nickname = request.params.get('nickname')
     response = lib_add_contact(username, contact_username, contact_nickname)
+    return json.dumps(response)
+
+# 删除联系人信息
+@app.route('/contact/<username>',  method=['OPTIONS', 'DELETE'])
+def delete_contact(username):
+    # 处理跨域访问中, 先发送 OPTIONS 的问题
+    if request.method == 'OPTIONS':
+        return {}
+
+    contact_username = request.params.get('username')
+    response = lib_delete_contact(username, contact_username)
     return json.dumps(response)
 
 # 获取联系人消息列表

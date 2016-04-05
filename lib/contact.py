@@ -32,6 +32,24 @@ def lib_add_contact(username, contact_username, contact_nickname):
     response['status'] = 'ok'
     return response
 
+# 添加联系人
+def lib_delete_contact(username, contact_username):
+    hash_key = 'contact:' + username
+    response = {}
+
+    try:
+        redis_client = redis.StrictRedis.from_url(config['REDIS_REMOTE_URL'])
+        redis_client.hdel(hash_key, contact_username)
+    except:
+        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
+        response['status'] = 'err'
+        response['data'] = "连接数据库错误!"
+        return response
+
+    logging.debug("Success delete contact contact:{} {}".format(contact_username, username))
+    response['status'] = 'ok'
+    return response
+
 # 列出联系人列表
 def lib_get_contact(username):
     hash_key = 'contact:' + username
