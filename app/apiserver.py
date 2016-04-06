@@ -106,4 +106,4 @@ def delete_message_list(fromUser):
         return {}
 
     toUser = request.params.get('username')
-    return lib_delete_message_history(fromUser, toUser)
+    return lib_delete_message_list(fromUser, toUser)
