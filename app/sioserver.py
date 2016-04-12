@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import socketio
-import logging
 import eventlet
 from eventlet import wsgi
 from config import config
 from app.apiserver import app
+from lib.logger import logger
 from lib.message import lib_send_redis_message
 
 try:
@@ -35,11 +35,11 @@ def init_sio():
     # Setting socket io event
     @sio.on('connect', namespace=socketio_namespace)
     def connect(sid, environ):
-        logging.debug('user connect {}'.format(sid))
+        logger.debug('user connect {}'.format(sid))
 
     @sio.on('disconnect', namespace=socketio_namespace)
     def disconnect(sid):
-        logging.debug('user disconnect {}'.format(sid))
+        logger.debug('user disconnect {}'.format(sid))
 
     @sio.on('enter room', namespace=socketio_namespace)
     def enter_room(sid, data):
@@ -52,7 +52,7 @@ def init_sio():
     # Process socket io msg
     @sio.on('msg', namespace=socketio_namespace)
     def process_message(sid, data):
-        logging.debug('process message: {}'.format(data))
+        logger.debug('process message: {}'.format(data))
 
         # Send to redis message queen
         lib_send_redis_message(data)
@@ -63,7 +63,7 @@ def init_sio():
     return sio
 
 def run_socketio_server():
-    logging.info("Socketio server run on host:{}, port:{}".format(config['SERVER_HOST'], config['SERVER_PORT']))
+    logger.info("Socketio server run on host:{}, port:{}".format(config['SERVER_HOST'], config['SERVER_PORT']))
     sio = init_sio()
     hybrid_server = socketio.Middleware(sio, app)
     eventlet_socket = eventlet.listen(('', config['SERVER_PORT']))

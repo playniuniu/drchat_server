@@ -1,6 +1,6 @@
 import redis
-import logging
 import json
+from lib.logger import logger
 from config import config
 
 try:
@@ -23,12 +23,12 @@ def lib_add_contact(username, contact_username, contact_nickname):
         redis_client = redis.StrictRedis.from_url(config['REDIS_REMOTE_URL'])
         redis_client.hset(hash_key, contact_username, json.dumps(params))
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
+        logger.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response
 
-    logging.debug("Success add contact {} to user {}".format(contact_username, username))
+    logger.debug("Success add contact {} to user {}".format(contact_username, username))
     response['status'] = 'ok'
     return response
 
@@ -41,12 +41,12 @@ def lib_delete_contact(username, contact_username):
         redis_client = redis.StrictRedis.from_url(config['REDIS_REMOTE_URL'])
         redis_client.hdel(hash_key, contact_username)
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
+        logger.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response
 
-    logging.debug("Success delete contact contact:{} {}".format(contact_username, username))
+    logger.debug("Success delete contact contact:{} {}".format(contact_username, username))
     response['status'] = 'ok'
     return response
 
@@ -59,7 +59,7 @@ def lib_get_contact(username):
         redis_client = redis.StrictRedis.from_url(config['REDIS_LOCAL_URL'])
         redis_data = redis_client.hvals(hash_key)
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
+        logger.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response

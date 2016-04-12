@@ -4,7 +4,7 @@
 import redis
 import json
 import socketio
-import logging
+from lib.logger import logger
 from config import config
 
 try:
@@ -20,9 +20,8 @@ def lib_send_redis_message(message, save_flag=True):
         redis = socketio.RedisManager(config['REDIS_REMOTE_URL'], channel=config['SOCKET_IO_CHANNEL'], write_only=True)
         # emit an event
         redis.emit('msg', data=message, namespace=config['SOCKET_IO_NAMESPACE'])
-        logging.debug("Emit msg: {}".format(message))
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
+        logger.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
         return False
 
     if(save_flag):
@@ -65,7 +64,7 @@ def lib_save_message_history(message):
         # 执行所有操作
         redis_pipeline.execute()
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
+        logger.error("ERROR! Cannot connect to {}".format(config['REDIS_REMOTE_URL']))
         return  False
 
 # 读取历史消息
@@ -77,7 +76,7 @@ def lib_get_message_history(from_user, to_user):
         redis_client = redis.StrictRedis.from_url(config['REDIS_LOCAL_URL'])
         redis_data = redis_client.lrange(redis_key, 0, config['REDIS_HISTORY_LONG'])
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
+        logger.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response
@@ -101,7 +100,7 @@ def lib_delete_message_history(from_user, to_user):
         # 删除消息列表
         redis_client.hdel(redis_key_message_list, to_user)
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
+        logger.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response
@@ -118,7 +117,7 @@ def lib_get_message_list(from_user):
         redis_client = redis.StrictRedis.from_url(config['REDIS_LOCAL_URL'])
         redis_data = redis_client.hvals(redis_key)
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
+        logger.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response
@@ -136,7 +135,7 @@ def lib_delete_message_list(from_user, to_user):
         redis_client = redis.StrictRedis.from_url(config['REDIS_REMOTE_URL'])
         redis_client.hdel(redis_key, to_user)
     except:
-        logging.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
+        logger.error("ERROR! Cannot connect to {}".format(config['REDIS_LOCAL_URL']))
         response['status'] = 'err'
         response['data'] = "连接数据库错误!"
         return response
