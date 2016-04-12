@@ -28,5 +28,5 @@ Drchat 共分成2个部分，一部分是 Server 端，一部分是 Client 端�
 - 使用 virtualenv 配置 python 运行环境，并使用 ```pip install -r requirements.txt``` 安装相应包
 - 安装 redis 和 supervisor ``` sudo apt-get install redis-server supervisor```
 - 将 resource 文件夹中的配置文件，根据服务类型，依次拷贝并作相应修改
-- 开启 sockeio server ```./run.py``` 测试服务运行情况
+- 开启 sockeio server, 在 virtualenv 模式下运行 ```python run.py``` 测试服务运行情况
 - 重启计算机，看 supervisor 是否正确配置并运行
