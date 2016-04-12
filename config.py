@@ -3,7 +3,8 @@
 config = {
     # 设置 Server
     'SERVER_HOST' : '0.0.0.0',
-    'SERVER_PORT' : 3000,
+    'SERVER_PORT' : 4000,
+    'SERVER_TYPE' : 'LOCAL', # 服务类型
     # 设置 SocketIO
     'SOCKET_IO_CHANNEL': 'drchat',
     'SOCKET_IO_NAMESPACE' : '/drchat',
