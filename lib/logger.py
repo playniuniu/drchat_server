@@ -19,7 +19,7 @@ formatter = logging.Formatter('[%(levelname)5s] %(asctime)s - %(filename)s:%(lin
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
 
-file_handler = logging.FileHandler(LOG_FILE_NAME)
+file_handler = logging.FileHandler(LOG_FILE_NAME,encoding='utf-8')
 file_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
