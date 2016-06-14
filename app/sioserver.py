@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import json
 import socketio
 import eventlet
 from eventlet import wsgi
@@ -7,6 +8,7 @@ from config import config
 from app.apiserver import app
 from lib.logger import logger
 from lib.message import lib_send_redis_message
+from lib.smsmessage import lib_send_sms_message
 
 try:
     from config_override import config_override
@@ -57,8 +59,11 @@ def init_sio():
         # Send to redis message queen
         lib_send_redis_message(data)
 
-        # Emit message to socket.io
-        # sio.emit('msg', data, namespace=socketio_namespace, skip_sid=sid)
+        # TODO: need to reconstruct to use cloud server to send sms message
+        # Send to sms
+        parse_data = json.loads(data)
+        if config['SERVER_TYPE'] == 'LOCAL' and parse_data['sendSmsFlag']:
+            lib_send_sms_message(data)
 
     return sio
 

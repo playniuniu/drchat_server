@@ -17,7 +17,7 @@ def lib_send_sms_message(message):
     parse_message = json.loads(message)
     sms_from = parse_message['fromUser']
     sms_to = parse_message['toUser']
-    sms_message = parse_message['messageBody']
+    sms_message = parse_message['messageBody'] + config['SMS_SUFFIX']
 
     sms_data = {
         'username': config['SMS_USERNAME'],
